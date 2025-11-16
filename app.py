@@ -402,6 +402,23 @@ with col2:
 
 # Sidebar with tips
 with st.sidebar:
+    st.header("📖 Example PDF")
+    st.markdown("Want to see what the output looks like?")
+    
+    # Download example PDF button
+    example_pdf_path = "sample_trip_itinerary.pdf"
+    if os.path.exists(example_pdf_path):
+        with open(example_pdf_path, "rb") as file:
+            st.download_button(
+                label="📥 Download Example PDF",
+                data=file,
+                file_name="example_trip_itinerary.pdf",
+                mime="application/pdf",
+                use_container_width=True,
+                help="Download a sample PDF to see what your itinerary will look like"
+            )
+    
+    st.markdown("---")
     st.header("💡 Tips")
     
     # Show current event type colors

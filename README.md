@@ -44,20 +44,22 @@ Or use the convenient start script:
 ```
 
 This will open a web interface in your browser where you can:
+- **Download an example PDF** to see what the output looks like
 - Fill in trip details with a user-friendly form
 - Add/remove days and events dynamically
 - Generate and download PDFs instantly
 - See live preview of your itinerary structure
 
 **Using the Web Interface:**
-1. Enter your trip name (required)
-2. Add destination and date range (optional)
-3. For each day:
+1. **(Optional)** Download the example PDF from the sidebar to see the output format
+2. Enter your trip name (required)
+3. Add destination and date range (optional)
+4. For each day:
    - Enter the date
    - Add events (flight, hotel, activity, etc.)
    - Fill in event-specific details
-4. Click "Generate PDF"
-5. Download your beautifully formatted itinerary!
+5. Click "Generate PDF"
+6. Download your beautifully formatted itinerary!
 
 ### Option 2: Python Script
 
