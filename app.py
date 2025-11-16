@@ -32,20 +32,6 @@ st.markdown("""
         color: #666;
         margin-bottom: 2rem;
     }
-    .day-section {
-        background-color: #f8f9fa;
-        padding: 1.5rem;
-        border-radius: 10px;
-        margin-bottom: 1.5rem;
-        border-left: 4px solid #1f77b4;
-    }
-    .event-section {
-        background-color: white;
-        padding: 1rem;
-        border-radius: 8px;
-        margin-bottom: 1rem;
-        border: 1px solid #e0e0e0;
-    }
     .stButton>button {
         width: 100%;
     }
@@ -92,8 +78,6 @@ def remove_event(day_idx, event_idx):
 
 # Display each day
 for day_idx, day in enumerate(st.session_state.days):
-    st.markdown(f'<div class="day-section">', unsafe_allow_html=True)
-    
     col1, col2 = st.columns([3, 1])
     with col1:
         st.subheader(f"Day {day_idx + 1}")
@@ -116,8 +100,6 @@ for day_idx, day in enumerate(st.session_state.days):
     
     # Display each event in this day
     for event_idx, event in enumerate(day['events']):
-        st.markdown(f'<div class="event-section">', unsafe_allow_html=True)
-        
         col1, col2 = st.columns([4, 1])
         with col1:
             st.markdown(f"**Event {event_idx + 1}**")
@@ -268,8 +250,6 @@ for day_idx, day in enumerate(st.session_state.days):
         )
         if notes:
             st.session_state.days[day_idx]['events'][event_idx]['notes'] = notes
-        
-        st.markdown('</div>', unsafe_allow_html=True)
     
     # Add event button
     if st.button(f"➕ Add Event to Day {day_idx + 1}", key=f"add_event_{day_idx}"):
@@ -279,8 +259,6 @@ for day_idx, day in enumerate(st.session_state.days):
     # Store day date
     if day_date:
         st.session_state.days[day_idx]['date'] = day_date
-    
-    st.markdown('</div>', unsafe_allow_html=True)
 
 # Add day button
 col1, col2, col3 = st.columns([1, 1, 1])
