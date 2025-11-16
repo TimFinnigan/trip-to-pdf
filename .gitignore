@@ -1,5 +1,7 @@
 # Generated PDFs
 *.pdf
+# But allow the sample PDF for reference
+!sample_trip_itinerary.pdf
 
 # Python
 __pycache__/
