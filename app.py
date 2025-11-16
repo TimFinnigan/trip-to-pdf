@@ -18,6 +18,17 @@ st.set_page_config(
 if 'days' not in st.session_state:
     st.session_state.days = [{'events': [{}]}]
 
+# Initialize custom event types
+if 'custom_event_types' not in st.session_state:
+    st.session_state.custom_event_types = {
+        'flight': '#3498db',
+        'hotel': '#e74c3c',
+        'activity': '#2ecc71',
+        'restaurant': '#f39c12',
+        'transport': '#9b59b6',
+        'other': '#95a5a6'
+    }
+
 # Custom CSS for better styling
 st.markdown("""
 <style>
@@ -52,6 +63,49 @@ with col2:
     destination = st.text_input("Destination", placeholder="e.g., Paris → Rome → Barcelona")
 with col3:
     dates = st.text_input("Dates", placeholder="e.g., June 15-25, 2024")
+
+st.markdown("---")
+
+# Event Types Section
+st.header("🎨 Event Types")
+
+with st.expander("Customize Event Types (Optional)", expanded=False):
+    st.markdown("Add custom event types or modify the default ones:")
+    
+    col1, col2, col3 = st.columns([2, 2, 1])
+    with col1:
+        new_type_name = st.text_input("Event Type Name", key="new_type_name", placeholder="e.g., Car Rental")
+    with col2:
+        new_type_color = st.color_picker("Color", key="new_type_color", value="#3498db")
+    with col3:
+        st.write("")  # Spacer
+        st.write("")  # Spacer
+        if st.button("➕ Add Type"):
+            if new_type_name:
+                type_key = new_type_name.lower().replace(' ', '_')
+                st.session_state.custom_event_types[type_key] = new_type_color
+                st.success(f"Added '{new_type_name}'!")
+                st.rerun()
+    
+    # Display current event types
+    st.markdown("**Current Event Types:**")
+    types_to_remove = []
+    
+    for event_type, color in st.session_state.custom_event_types.items():
+        col1, col2, col3 = st.columns([2, 2, 1])
+        with col1:
+            st.markdown(f"**{event_type.replace('_', ' ').title()}**")
+        with col2:
+            # Color preview
+            st.markdown(f'<div style="background-color: {color}; padding: 8px; border-radius: 4px; color: white; text-align: center;">{color}</div>', unsafe_allow_html=True)
+        with col3:
+            if st.button("🗑️", key=f"remove_type_{event_type}"):
+                types_to_remove.append(event_type)
+    
+    # Remove types after iteration
+    for type_to_remove in types_to_remove:
+        del st.session_state.custom_event_types[type_to_remove]
+        st.rerun()
 
 st.markdown("---")
 
@@ -111,10 +165,13 @@ for day_idx, day in enumerate(st.session_state.days):
         
         col1, col2, col3 = st.columns(3)
         with col1:
+            # Get list of available event types
+            available_types = list(st.session_state.custom_event_types.keys())
             event_type = st.selectbox(
                 "Event Type *",
-                ["flight", "hotel", "activity", "restaurant", "transport", "other"],
-                key=f"event_type_{day_idx}_{event_idx}"
+                available_types,
+                key=f"event_type_{day_idx}_{event_idx}",
+                format_func=lambda x: x.replace('_', ' ').title()
             )
         with col2:
             event_time = st.text_input(
@@ -231,16 +288,26 @@ for day_idx, day in enumerate(st.session_state.days):
                 if company:
                     st.session_state.days[day_idx]['events'][event_idx]['company'] = company
         
-        else:  # other
+        else:  # Custom event types or "other"
             col1, col2 = st.columns(2)
             with col1:
                 name = st.text_input("Name/Title", key=f"other_name_{day_idx}_{event_idx}")
                 if name:
                     st.session_state.days[day_idx]['events'][event_idx]['name'] = name
             with col2:
+                location = st.text_input("Location", key=f"custom_location_{day_idx}_{event_idx}")
+                if location:
+                    st.session_state.days[day_idx]['events'][event_idx]['location'] = location
+            
+            col1, col2 = st.columns(2)
+            with col1:
                 details = st.text_input("Details", key=f"other_details_{day_idx}_{event_idx}")
                 if details:
                     st.session_state.days[day_idx]['events'][event_idx]['details'] = details
+            with col2:
+                confirmation = st.text_input("Confirmation/Reference", key=f"custom_conf_{day_idx}_{event_idx}")
+                if confirmation:
+                    st.session_state.days[day_idx]['events'][event_idx]['confirmation'] = confirmation
         
         # Notes field for all event types
         notes = st.text_area(
@@ -314,8 +381,8 @@ with col2:
                     if day_data['events']:
                         trip_data['days'].append(day_data)
                 
-                # Generate PDF
-                generate_pdf_from_data(trip_data, output_filename)
+                # Generate PDF with custom colors
+                generate_pdf_from_data(trip_data, output_filename, st.session_state.custom_event_types)
                 
                 st.success(f"✅ PDF generated successfully: {output_filename}")
                 
@@ -336,16 +403,17 @@ with col2:
 # Sidebar with tips
 with st.sidebar:
     st.header("💡 Tips")
-    st.markdown("""
-    **Event Type Colors:**
-    - 🔵 **Flight** - Blue
-    - 🔴 **Hotel** - Red
-    - 🟢 **Activity** - Green
-    - 🟠 **Restaurant** - Orange
-    - 🟣 **Transport** - Purple
-    - ⚪ **Other** - Gray
     
+    # Show current event type colors
+    st.markdown("**Your Event Types:**")
+    for event_type, color in st.session_state.custom_event_types.items():
+        color_icon = f'<span style="display:inline-block; width:12px; height:12px; background-color:{color}; border-radius:2px; margin-right:5px;"></span>'
+        st.markdown(f'{color_icon}**{event_type.replace("_", " ").title()}**', unsafe_allow_html=True)
+    
+    st.markdown("")
+    st.markdown("""
     **Pro Tips:**
+    - Customize event types in the "Event Types" section
     - Add confirmation numbers for easy reference
     - Use consistent time formats (e.g., "10:00 AM")
     - Include addresses for easy navigation
@@ -354,10 +422,11 @@ with st.sidebar:
     
     **Quick Start:**
     1. Enter trip name (required)
-    2. Add destination and dates (optional)
-    3. Fill in events for each day
-    4. Click "Generate PDF"
-    5. Download your itinerary!
+    2. (Optional) Customize event types
+    3. Add destination and dates (optional)
+    4. Fill in events for each day
+    5. Click "Generate PDF"
+    6. Download your itinerary!
     """)
     
     st.markdown("---")

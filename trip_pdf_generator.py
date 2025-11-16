@@ -145,17 +145,20 @@ class TripPDFGenerator:
         event_type = event.get('type', 'Event').upper()
         time = event.get('time', '')
         
-        # Color coding for different event types
-        color_map = {
-            'FLIGHT': '#3498db',
-            'HOTEL': '#e74c3c',
-            'ACTIVITY': '#2ecc71',
-            'RESTAURANT': '#f39c12',
-            'TRANSPORT': '#9b59b6',
-            'OTHER': '#95a5a6'
-        }
+        # Use custom color map if available, otherwise use defaults
+        if hasattr(self, 'color_map'):
+            color_map = self.color_map
+        else:
+            color_map = {
+                'FLIGHT': '#3498db',
+                'HOTEL': '#e74c3c',
+                'ACTIVITY': '#2ecc71',
+                'RESTAURANT': '#f39c12',
+                'TRANSPORT': '#9b59b6',
+                'OTHER': '#95a5a6'
+            }
         
-        bg_color = colors.HexColor(color_map.get(event_type, color_map['OTHER']))
+        bg_color = colors.HexColor(color_map.get(event_type, color_map.get('OTHER', '#95a5a6')))
         
         # Create event table
         data = []
@@ -314,16 +317,21 @@ def create_sample_trip():
     return trip_data
 
 
-def generate_pdf_from_data(trip_data, output_filename="trip_itinerary.pdf"):
+def generate_pdf_from_data(trip_data, output_filename="trip_itinerary.pdf", custom_event_types=None):
     """
     Generate a PDF from trip data dictionary
     
     Args:
         trip_data: Dictionary containing trip information
         output_filename: Name of output PDF file
+        custom_event_types: Optional dictionary mapping event type names to color hex codes
     """
     
     generator = TripPDFGenerator(output_filename)
+    
+    # Set custom color map if provided
+    if custom_event_types:
+        generator.color_map = {k.upper(): v for k, v in custom_event_types.items()}
     
     # Add title
     generator.add_title(
