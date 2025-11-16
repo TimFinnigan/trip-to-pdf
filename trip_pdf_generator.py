@@ -38,7 +38,7 @@ class TripPDFGenerator:
             parent=self.styles['Heading1'],
             fontSize=28,
             textColor=colors.HexColor('#1a1a1a'),
-            spaceAfter=6,
+            spaceAfter=20,
             alignment=TA_CENTER,
             fontName='Helvetica-Bold'
         ))
